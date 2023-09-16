@@ -5,8 +5,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode #настройки разметки сообщений
 import os
 
-import constConfig, constKeyboards, constText
-import mGetter, mSetter, mChecker
+import constConfig, constKeyboards, constText, constPrices
+import mGetter, mSetter, mChecker, roulette
 
 router = Router()
 bot = Bot(token = constConfig.BOT_TOKEN)
@@ -83,16 +83,160 @@ commands = {
     "Приобрести выставление конкурса для шопа": {"text": constText.contests, "reply_markup": constKeyboards.letsgo_contest_s}, # конкурс для шопа
 
     # приобретение
-    "Потратить тендеры":                    {"text": constText.piar_12_p, "reply_markup": constKeyboards.done}, # пиар 12 часов для пользователя 
-    "Пoтратить тендеры":                    {"text": constText.piar_12_s, "reply_markup": constKeyboards.done}, # пиар 12 часов для шопа
-    "Потратить тeндеры":                    {"text": constText.piar_24_p, "reply_markup": constKeyboards.done}, # пиар 24 часа для пользователя
-    "Потратить тендeры":                    {"text": constText.piar_24_s, "reply_markup": constKeyboards.done}, # пиар 24 часа для шопа
-    "Потратить тeндeры":                    {"text": constText.con_p,     "reply_markup": constKeyboards.done}, # конкурс для пользователя
-    "Пoтратить тeндeры":                    {"text": constText.con_s,     "reply_markup": constKeyboards.done}, # конкурс для шопа
-    "Пoтратить тeндеры":                    {"text": constText.prod,      "reply_markup": constKeyboards.done}, # продукт
-    "Пoтратить тендeры":                    {"text": constText.rep,       "reply_markup": constKeyboards.done}, # репост
     "Предметы баннера" :                    {"text": constText.items,     "reply_markup": constKeyboards.faq }
 }
+
+# пиар 12 часов для пользователя
+@router.message(F.text == "Потратить тендеры")
+async def buyPiar12P(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["piar_12_p"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.piar_12_p,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# пиар 12 часов для шопа
+@router.message(F.text == "Пoтратить тендеры")
+async def buyPiar12S(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["piar_12_s"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.piar_12_s,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# пиар 24 часа для пользователя
+@router.message(F.text == "Потратить тeндеры")
+async def buyPiar24P(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["piar_24_p"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.piar_24_p,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# пиар 24 часа для шопа
+@router.message(F.text == "Потратить тендeры")
+async def buyPiar24S(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["piar_24_s"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.piar_24_s,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# конкурс для пользователя
+@router.message(F.text == "Потратить тeндeры")
+async def buyConP(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["contest_p"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.con_p,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# конкурс для шопа
+@router.message(F.text == "Пoтратить тeндeры")
+async def buyConS(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["contest_s"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.con_s,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# продукт
+@router.message(F.text == "Пoтратить тeндеры")
+async def buyProduct(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["product"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.prod,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+
+# репост
+@router.message(F.text == "Пoтратить тендeры")
+async def buyRepost(msg: types.Message):
+    balance = await mGetter.getBalance(msg.chat.id)
+    price = constPrices.allprices["repost"]
+    if (balance >= price):
+        await mSetter.setBalance(msg.chat.id, balance - price)
+        await msg.answer(
+            text = constText.rep,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
+    else:
+        await msg.answer(
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
+        ) 
 
 # обработчик любых команд баннера
 @router.message(F.text.in_(banner_commands.keys()))
@@ -139,4 +283,4 @@ async def RollBanner(msg: types.Message):
         text = "Загружаем результат...",
         parse_mode = "HTML"
     )
-    await mGetter.GetRouletteDrop(bot, msg)
+    await roulette.getRouletteDrop(bot, msg)

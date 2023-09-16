@@ -1,6 +1,8 @@
 from aiogram import Bot, Dispatcher, types
 import random, os, sqlite3
+
 import constText, constKeyboards, constPaths
+import mGetter, mChecker, mSetter
 
 # английские буквы
 tess_banner_drop = [
@@ -20,52 +22,47 @@ artist_banner_drop = [
 ]
 
 # 1/3/5 круток
-async def GetRouletteDrop(bot: Bot, message: types.Message):
+async def getRouletteDrop(bot: Bot, message: types.Message):
     # парсер числа круток
     spins = int(message.text[message.text.find(": ") + 2 :])
 
-    # баннер художников
-    if ('круток' in message.text.lower()):
-        banner_drop = artist_banner_drop
-    else:
-        banner_drop = tess_banner_drop
+    # выбор предметов баннера
+    banner_drop = artist_banner_drop if ('круток' in message.text.lower()) else tess_banner_drop
 
     # проверка баланса
-    user_id = str(message.chat.id)
-    user_path = os.path.join(os.getcwd(), "database", user_id)
-    if (os.path.exists(user_path)):
-        with open(os.path.join(user_path, "balance.txt"), "r") as file:
-            balance = int(file.read().replace("\n", ""))
+    balance = await mGetter.getBalance(message.chat.id)
 
     # если хватает денег на крутку
     if (balance >= spins):
-        # изменяем баланс в связи с покупкой
-        with open(os.path.join(user_path, "balance.txt"), "w") as file:
-            file.write(str(balance - spins))
 
-        collected_drop = []       # выбитые штуки
+        # выбитые предметы
+        collected_drop = []
         for spin in range(spins):
-            # выбор произвольного варианта
-            options = [x for x in range(1, 101)]
-            chosen_option = random.choice(options)
-
-            # идёт по всем возможным опциям, и складывает их вероятности, чтобы
-            # выбитый процент <chosen_option> указывал на нужную опцию
-            current_percentage = 0
-            for drop_item in banner_drop:
-                if (current_percentage + drop_item["probability"] >= chosen_option):
-                    collected_drop.append(drop_item["name"])
-                    break
-                
-                else:
-                    current_percentage += drop_item["probability"]
+            current_drop = await mGetter.getBannerResult()
+            if (current_drop == 0):
+                break
             
+            balance -= 1
+            await mSetter.setBalance(message.chat.id, balance) # уменьшение баланса пользователя
+            await mSetter.setBannerDropQuantity(current_drop)  # уменьшение числа оставшихся предметов
+            collected_drop.append(current_drop)
+        
+        # переводим дроп из id в названия
+        conn = sqlite3.connect(constPaths.db_paths["banner_prizes"], check_same_thread = False)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM possible_prizes")
+        exists = cursor.fetchall()
+        cursor.close(); conn.close()
+
         # выводим полученный дроп
-        reply = "Поздравляем! Выбитые предметы:\n"
+        reply = constText.buying1
         for drop in collected_drop:
-            reply += f"- {drop}\n\n"
-            reply += constText.buying2
-            reply += constText.admin
+            for result in exists:
+                if (result[0] == drop):
+                    reply += f"- {result[1]}\n"
+                    break
+        reply += constText.buying2
+        reply += constText.admin
         
         #
         #
@@ -77,12 +74,13 @@ async def GetRouletteDrop(bot: Bot, message: types.Message):
         await message.answer(
             text = reply,
             reply_markup = constKeyboards.done,
-            parse_mode = "HTML"
+            parse_mode = "Markdown"
         )
     
     else:
+        # если не хватило денег
         await message.answer(
-            text = "Ваш баланс недостаточен для выполнения данной операции!",
-            reply_markup = constKeyboards.kb_d,
-            parse_mode = "HTML"
+            text = constText.buying_failure,
+            reply_markup = constKeyboards.done,
+            parse_mode = "Markdown"
         )

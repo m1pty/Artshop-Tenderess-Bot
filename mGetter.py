@@ -1,4 +1,4 @@
-import asyncio, sqlite3, os
+import asyncio, sqlite3, os, random
 import constPaths
 
 # получение баланса по id пользователя
@@ -14,23 +14,23 @@ async def getBalance(user_id: int):
     return user_balance[0][0]
 
 # получение доступных призов баннера
-async def getTable():
+async def getTable() -> list:
     conn = sqlite3.connect(constPaths.db_paths["banner_prizes"], check_same_thread = False)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM possible_prizes")
+    cursor.execute("SELECT * FROM possible_prizes WHERE quantity > 0")
     exists = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    if exists:
-        return exists
+    cursor.close(); conn.close()
+    return exists
 
 # возвращает список для выбора в рулетке
-async def getBannerDrop() -> list:
-    """ Returns list of possible prizes to random_get_from"""
+async def getBannerResult() -> list:
     firstly = await getTable()
     possible_list = list()
     for string in firstly:
         sum = string[3] * string[2]
         for i in range(sum):
             possible_list.append(string[0])
-    return possible_list
+    
+    if (len(possible_list) == 0):
+        return 0
+    return random.choice(possible_list)
