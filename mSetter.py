@@ -38,7 +38,7 @@ async def setBalance(user_id: int, balance: int) -> None:
     cursor.close(); connection.close()
 
 # уменьшение количества элементов дропа по id
-async def setBannerDropQuantity(drop_id: int):
+async def setBannerDropQuantity(drop_id: int) -> None:
     drop_db = constPaths.db_paths["banner_prizes"]
     connection = sqlite3.connect(drop_db)
     cursor = connection.cursor()

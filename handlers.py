@@ -244,17 +244,31 @@ async def buyRepost(msg: types.Message):
             parse_mode = "Markdown"
         ) 
 
-#  предметы баннера художников
+# предметы баннера художников
 @router.message(F.text == "Предметы баннера")
 async def handleArtBannerItems(msg: types.Message):
     possible = await mGetter.getArtBannerDrop()
     reply = constText.art_banner_items
     for element in possible:
-        reply += f"\n- {element[1]} (x{element[2]})"
+        reply += f"\n📎 {element[1]} (x{element[2]})"
 
     await msg.answer(
         text = reply,
-        reply_markup = constKeyboards.banner_kb_artists, 
+        reply_markup = constKeyboards.artist_kb, 
+        parse_mode = "Markdown"
+    )
+
+# предметы баннера Тесс
+@router.message(F.text == "Пpедметы баннера")
+async def handleTessBannerItems(msg: types.Message):
+    possible = await mGetter.getTessBannerDrop()
+    reply = constText.tess_banner_items
+    for element in possible:
+        reply += f"\n📎 {element[1]}"
+
+    await msg.answer(
+        text = reply,
+        reply_markup = constKeyboards.tess_kb,
         parse_mode = "Markdown"
     )
 
@@ -310,3 +324,11 @@ async def RollBanner(msg: types.Message):
         parse_mode = "HTML"
     )
     await roulette.getRouletteDrop(bot, msg)
+
+@router.message(F.text == "Меню разработчика")
+async def handleTessBannerItems(msg: types.Message):
+    await msg.answer(
+        text = constText.admin_menu,
+        reply_markup = constKeyboards.tess_kb,
+        parse_mode = "Markdown"
+    )

@@ -23,7 +23,7 @@ banner_kb_artists = ReplyKeyboardMarkup(keyboard = kb_banner_artists, resize_key
 kb_banner_tess = [
     [KeyboardButton(text = "Потратить крутoк: 1")], [KeyboardButton(text = "Потратить крутoк: 3")], [KeyboardButton(text = "Потратить крутoк: 5")], [KeyboardButton(text = "Пpедметы баннера")], [KeyboardButton(text = "Вернуться в меню")]
 ]
-banner_kb_tess = ReplyKeyboardMarkup(keyboard = kb_banner_artists, resize_keyboard = True)
+banner_kb_tess = ReplyKeyboardMarkup(keyboard = kb_banner_tess, resize_keyboard = True)
 
 # shop:
 kb_s = [
@@ -134,3 +134,15 @@ kb_done = [
     [KeyboardButton(text = "Вернуться в меню")]
 ]
 done = ReplyKeyboardMarkup(keyboard = kb_done, resize_keyboard = True)
+
+kb_tess = [
+    [KeyboardButton(text = "Баннер Тесс")],
+    [KeyboardButton(text = "Вернуться в меню")]
+]
+tess_kb = ReplyKeyboardMarkup(keyboard = kb_tess, resize_keyboard = True)
+
+kb_artist = [
+    [KeyboardButton(text = "Баннер художников")],
+    [KeyboardButton(text = "Вернуться в меню")]
+]
+artist_kb = ReplyKeyboardMarkup(keyboard = kb_artist, resize_keyboard = True)

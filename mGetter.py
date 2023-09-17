@@ -13,7 +13,7 @@ async def getBalance(user_id: int):
 
     return user_balance[0][0]
 
-# получение доступных призов баннера
+# возвращает доступных призов баннера
 async def getTable() -> list:
     conn = sqlite3.connect(constPaths.db_paths["banner_prizes"], check_same_thread = False)
     cursor = conn.cursor()
@@ -22,8 +22,8 @@ async def getTable() -> list:
     cursor.close(); conn.close()
     return exists
 
-# возвращает список для выбора в рулетке
-async def getBannerResult() -> list:
+# возвращает выбор в рулетке
+async def getBannerResult():
     firstly = await getTable()
     possible_list = list()
     for string in firstly:
@@ -33,6 +33,29 @@ async def getBannerResult() -> list:
     
     if (len(possible_list) == 0):
         return 0
+    return random.choice(possible_list)
+
+# возвращает выбор в баннере Тесс
+async def getTessBannerResult():
+    connection = sqlite3.connect(
+        constPaths.db_paths["banner_prizes"],
+        check_same_thread = False
+    )
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM possible_prizes WHERE weight = 0")
+    things = cursor.fetchall()
+    cursor.close(); connection.close()
+
+    # возвращение массива вероятностей
+    possible_list = list()
+    for string in things:
+        sum = string[4]
+        for i in range(sum):
+            possible_list.append(string[0])
+    
+    if (len(possible_list) == 0):
+        return 0
+    
     return random.choice(possible_list)
 
 # возвращает инвентарь пользователя
@@ -55,6 +78,18 @@ async def getArtBannerDrop() -> list:
     )
     cursor = connection.cursor()
     cursor.execute(f"SELECT * FROM possible_prizes WHERE quantity > 0 AND weight != 0")
+    item_list = cursor.fetchall()
+    cursor.close(); connection.close()
+    return item_list
+
+# вывод доступных предметов баннера Тесс
+async def getTessBannerDrop() -> list:
+    connection = sqlite3.connect(
+        constPaths.db_paths["banner_prizes"],
+        check_same_thread = False
+    )
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * FROM possible_prizes WHERE quantity > 0 AND weight = 0")
     item_list = cursor.fetchall()
     cursor.close(); connection.close()
     return item_list
