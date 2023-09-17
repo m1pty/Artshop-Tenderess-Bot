@@ -42,7 +42,19 @@ async def getUserInventory(user_id: int) -> list:
         check_same_thread = False
     )
     cursor = connection.cursor()
-    cursor.execute(f"SELECT * FROM '{user_id}' WHERE quantity > 0")
+    cursor.execute(f"SELECT * FROM '{user_id}' WHERE quantity > 0 AND id > 0")
+    item_list = cursor.fetchall()
+    cursor.close(); connection.close()
+    return item_list
+
+# вывод доступных предметов баннера художников
+async def getArtBannerDrop() -> list:
+    connection = sqlite3.connect(
+        constPaths.db_paths["banner_prizes"],
+        check_same_thread = False
+    )
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * FROM possible_prizes WHERE quantity > 0 AND weight != 0")
     item_list = cursor.fetchall()
     cursor.close(); connection.close()
     return item_list

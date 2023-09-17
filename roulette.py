@@ -2,7 +2,7 @@ from aiogram import Bot, Dispatcher, types
 import random, os, sqlite3
 
 import constText, constKeyboards, constPaths, constIds
-import mGetter, mChecker, mSetter
+import mGetter, mChecker, mSetter, constPrices
 
 # английские буквы
 tess_banner_drop = [
@@ -13,7 +13,7 @@ tess_banner_drop = [
     {"name": "Рисунок от artist3", "probability": 18}
 ]
 
-# 1/3/5 круток
+# рулетка (художников / Тесс)
 async def getRouletteDrop(bot: Bot, message: types.Message):
     # парсер числа круток
     spins = int(message.text[message.text.find(": ") + 2 :])
@@ -25,7 +25,7 @@ async def getRouletteDrop(bot: Bot, message: types.Message):
     balance = await mGetter.getBalance(message.chat.id)
 
     # если хватает денег на крутку
-    if (balance >= spins):
+    if (balance >= spins * constPrices.allprices["twist"]):
         
         # выбитые предметы
         collected_drop = []
@@ -34,7 +34,7 @@ async def getRouletteDrop(bot: Bot, message: types.Message):
             if (current_drop == 0):
                 break
             
-            balance -= 1
+            balance -= constPrices.allprices["twist"]
             await mSetter.setBalance(message.chat.id, balance) # уменьшение баланса пользователя
             await mSetter.setBannerDropQuantity(current_drop)  # уменьшение числа оставшихся предметов
             collected_drop.append(current_drop)
@@ -47,13 +47,13 @@ async def getRouletteDrop(bot: Bot, message: types.Message):
         cursor.close(); conn.close()
 
         # выводим полученный дроп
-        reply = constText.buying1
+        reply = f"{message.chat.id}" + constText.buying1
         for drop in collected_drop:
             for result in exists:
                 if (result[0] == drop):
                     reply += f"- {result[1]}\n"
                     break
-        reply += constText.buying2
+        reply += f"\n{constText.buying2}"
         reply += constText.admin
         
         # заполняем дроп пользователю

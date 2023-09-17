@@ -82,9 +82,6 @@ commands = {
     "Приобрести пиар на 24 часа для шопа" :     {"text": constText.piar24s, "reply_markup": constKeyboards.letsgo_piar_24_s},
     "Приобрести выставление конкурса для себя": {"text": constText.contestp, "reply_markup": constKeyboards.letsgo_contest_p}, # конкурс для пользователя
     "Приобрести выставление конкурса для шопа": {"text": constText.contests, "reply_markup": constKeyboards.letsgo_contest_s}, # конкурс для шопа
-
-    # приобретение
-    "Предметы баннера" :                    {"text": constText.items,     "reply_markup": constKeyboards.faq }
 }
 
 # пиар 12 часов для пользователя
@@ -246,6 +243,20 @@ async def buyRepost(msg: types.Message):
             reply_markup = constKeyboards.done,
             parse_mode = "Markdown"
         ) 
+
+#  предметы баннера художников
+@router.message(F.text == "Предметы баннера")
+async def handleArtBannerItems(msg: types.Message):
+    possible = await mGetter.getArtBannerDrop()
+    reply = constText.art_banner_items
+    for element in possible:
+        reply += f"\n- {element[1]} (x{element[2]})"
+
+    await msg.answer(
+        text = reply,
+        reply_markup = constKeyboards.banner_kb_artists, 
+        parse_mode = "Markdown"
+    )
 
 # обработчик любых команд баннера
 @router.message(F.text.in_(banner_commands.keys()))
