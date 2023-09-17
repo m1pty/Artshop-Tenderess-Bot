@@ -1,19 +1,11 @@
 from aiogram import Bot, Dispatcher, types
 import random, os, sqlite3
 
-import constText, constKeyboards, constPaths
+import constText, constKeyboards, constPaths, constIds
 import mGetter, mChecker, mSetter
 
 # английские буквы
 tess_banner_drop = [
-    {"name": "Пиар на 12ч", "probability": 30},
-    {"name": "Пиар на 24ч", "probability": 16},
-    {"name": "Рисунок от artist1", "probability": 18},
-    {"name": "Рисунок от artist2", "probability": 18},
-    {"name": "Рисунок от artist3", "probability": 18}
-]
-
-artist_banner_drop = [
     {"name": "Пиар на 12ч", "probability": 30},
     {"name": "Пиар на 24ч", "probability": 16},
     {"name": "Рисунок от artist1", "probability": 18},
@@ -27,14 +19,14 @@ async def getRouletteDrop(bot: Bot, message: types.Message):
     spins = int(message.text[message.text.find(": ") + 2 :])
 
     # выбор предметов баннера
-    banner_drop = artist_banner_drop if ('круток' in message.text.lower()) else tess_banner_drop
+    # banner_drop = artist_banner_drop if ('круток' in message.text.lower()) else tess_banner_drop
 
     # проверка баланса
     balance = await mGetter.getBalance(message.chat.id)
 
     # если хватает денег на крутку
     if (balance >= spins):
-
+        
         # выбитые предметы
         collected_drop = []
         for spin in range(spins):
@@ -64,11 +56,9 @@ async def getRouletteDrop(bot: Bot, message: types.Message):
         reply += constText.buying2
         reply += constText.admin
         
-        #
-        #
-        # записывает результат для пользователя
-        #
-        #
+        # заполняем дроп пользователю
+        for drop in collected_drop:
+            await mSetter.setUserArtistDropById(message.chat.id, drop)
                         
         # отправляем сообщение в ответ
         await message.answer(

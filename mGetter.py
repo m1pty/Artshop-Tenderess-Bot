@@ -34,3 +34,15 @@ async def getBannerResult() -> list:
     if (len(possible_list) == 0):
         return 0
     return random.choice(possible_list)
+
+# возвращает инвентарь пользователя
+async def getUserInventory(user_id: int) -> list:
+    connection = sqlite3.connect(
+        constPaths.db_paths["user_drops"],
+        check_same_thread = False
+    )
+    cursor = connection.cursor()
+    cursor.execute(f"SELECT * FROM '{user_id}' WHERE quantity > 0")
+    item_list = cursor.fetchall()
+    cursor.close(); connection.close()
+    return item_list

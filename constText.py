@@ -25,7 +25,8 @@ artist_banner = artist_banner_main + artist_banner_second + for_banner_one
 tess_banner = tess_banner_main + tess_banner_second + for_banner_one
 
 shop = shop_up + shop_second + shop_third
-balance = "💸 Твой баланс: "
+balance = "💸 Ваш баланс: "
+inventory = "🎒 Ваш инвентарь: "
 donate = "💸 Вы можете приобрести тендеры за реальную валюту!"
 faq = "❓ Тут будут ответы на частые вопросы"
 piar = "Вы хотите приобрести эту услугу для себя или для шопа?"

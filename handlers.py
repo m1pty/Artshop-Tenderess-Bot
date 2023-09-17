@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums.parse_mode import ParseMode #настройки разметки сообщений
 import os
 
-import constConfig, constKeyboards, constText, constPrices
+import constConfig, constKeyboards, constText, constPrices, constIds
 import mGetter, mSetter, mChecker, roulette
 
 router = Router()
@@ -19,6 +19,7 @@ async def newUser(msg: types.Message):
     # инициализация нулевого баланса, если нужно
     if (not await mChecker.checkAccountExistance(user_id)):
         await mSetter.setNewUserBalance(user_id)
+        await mSetter.setNewUserDrop(user_id)
         print(f"[SYSTEM]: mChecker.checkAccountExistance ({user_id}) -> False")
         print(f"[SYSTEM]: mSetter.setNewUserBalance ({user_id})")
     else:
@@ -93,6 +94,7 @@ async def buyPiar12P(msg: types.Message):
     price = constPrices.allprices["piar_12_p"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["piar_12_p"])
         await msg.answer(
             text = constText.piar_12_p,
             reply_markup = constKeyboards.done,
@@ -112,6 +114,7 @@ async def buyPiar12S(msg: types.Message):
     price = constPrices.allprices["piar_12_s"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["piar_12_s"])
         await msg.answer(
             text = constText.piar_12_s,
             reply_markup = constKeyboards.done,
@@ -131,6 +134,7 @@ async def buyPiar24P(msg: types.Message):
     price = constPrices.allprices["piar_24_p"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["piar_24_p"])
         await msg.answer(
             text = constText.piar_24_p,
             reply_markup = constKeyboards.done,
@@ -150,6 +154,7 @@ async def buyPiar24S(msg: types.Message):
     price = constPrices.allprices["piar_24_s"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["piar_24_s"])
         await msg.answer(
             text = constText.piar_24_s,
             reply_markup = constKeyboards.done,
@@ -169,6 +174,7 @@ async def buyConP(msg: types.Message):
     price = constPrices.allprices["contest_p"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["contest_p"])
         await msg.answer(
             text = constText.con_p,
             reply_markup = constKeyboards.done,
@@ -188,6 +194,7 @@ async def buyConS(msg: types.Message):
     price = constPrices.allprices["contest_s"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["contest_s"])
         await msg.answer(
             text = constText.con_s,
             reply_markup = constKeyboards.done,
@@ -207,6 +214,7 @@ async def buyProduct(msg: types.Message):
     price = constPrices.allprices["product"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["product"])
         await msg.answer(
             text = constText.prod,
             reply_markup = constKeyboards.done,
@@ -226,6 +234,7 @@ async def buyRepost(msg: types.Message):
     price = constPrices.allprices["repost"]
     if (balance >= price):
         await mSetter.setBalance(msg.chat.id, balance - price)
+        await mSetter.setUserArtistDropById(msg.chat.id, constIds.ids["repost"])
         await msg.answer(
             text = constText.rep,
             reply_markup = constKeyboards.done,
@@ -253,11 +262,17 @@ async def AnyBannerHandler(msg: types.Message):
 # вывод баланса
 @router.message(F.text == "Баланс")
 async def handleBalance(msg: types.Message):
-    balance = await mGetter.getBalance(msg.chat.id)
+    balance   = await mGetter.getBalance(msg.chat.id)
+    inventory = await mGetter.getUserInventory(msg.chat.id)
+    inventory_reply = constText.inventory
+    for element in inventory:
+        inventory_reply += f"\n- {element[1]} (x{element[2]})"
+
+    text_reply = constText.balance + str(balance) + f"\n{inventory_reply}"
     await msg.answer(
-        text = constText.balance + str(balance),
+        text = text_reply,
         reply_markup = constKeyboards.balance, 
-        parse_mode = "HTML"
+        parse_mode = "Markdown"
     )
 
 # обработка команд
